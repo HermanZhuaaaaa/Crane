@@ -5,22 +5,27 @@
 
 //定义三个电机对象,其中0、1为轮子,3为云台
 extern MOTOR motor[3];
+extern Cascade_PID my_pid;
+float pos;
 
 //对轮子进行初始化
 void cheel_init(void)
 {
-	const float init_pid_inner[3] = {0.95, 0.2, 0.1};//设定P、I、D三个参数
-	const 	float init_pid_outer[3] = {1	,	0.2,0.1};
+	const 	float init_pid_inner[3] = {2, 0, 0};//设定P、I、D三个参数
+	const 	float init_pid_outer[3] = {3, 0, 0};
 
 	int now = 0;
-	int max_out_inner = 2500, max_iout_inner = 1250;
-	int max_out_outer = 5000, max_iout_outer = 2500;	
+	int max_out_inner = 1000, max_iout_inner = 700;
+	int max_out_outer = 200, max_iout_outer = 250;	
+	PID_init(&my_pid.inner,init_pid_inner, max_out_inner, max_iout_inner);
+	PID_init(&my_pid.outer,init_pid_outer, max_out_outer, max_iout_outer);
 	for(int i = 0; i < 2; i ++){
 		//PID初始化函数
 		PID_init(&motor[i].pid_inner, init_pid_inner, max_out_inner, max_iout_inner);
 		PID_init(&motor[i].pid_outer, init_pid_outer, max_out_outer, max_iout_outer);
-
+		
 	}
+	
 }
 
 //uint16_t motor_angle_calc(uint8_t addr)
@@ -31,12 +36,10 @@ void cheel_init(void)
 
 void motor_position_control(float set_pos,uint8_t addr)
 {
-	Cascade_PID my_pid;
-	float p;
-	p = Cascade_PID_calc(&my_pid,set_pos,motor[addr].circle,motor[addr].speed_rpm);
-	if(addr == 1) CAN_cmd_chassis(p,0,0,0);
-	if(addr == 2) CAN_cmd_chassis(0,p,0,0);
-	if(addr == 3) CAN_cmd_chassis(0,0,p,0);
+	pos = Cascade_PID_calc(&my_pid,set_pos,motor[addr].circle,motor[addr].speed_rpm);
+	if(addr == 1) CAN_cmd_chassis(pos,0,0,0);
+	if(addr == 2) CAN_cmd_chassis(0,pos,0,0);
+	if(addr == 3) CAN_cmd_chassis(0,0,pos,0);
 	
 }
 //两轮子进行控制,其中set是预定的速度,time是前进时间

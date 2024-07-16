@@ -12,7 +12,7 @@ typedef struct{
   int16_t given_current;//电流
   uint8_t temperate;//温度
   int16_t last_ecd;//原角度
-	uint16_t circle;	//圈数
+	int16_t circle;	//圈数
 	
 	pid_type_def pid_inner;//该电机的PID结构体
 	pid_type_def pid_outer;

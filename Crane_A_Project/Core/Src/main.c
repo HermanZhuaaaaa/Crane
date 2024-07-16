@@ -51,19 +51,20 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+Cascade_PID my_pid;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+void delay_ms(uint16_t cnt);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
- MOTOR motor[3];
-motor_measure_t motor_chassis[7];
+
+	MOTOR motor[3];
+	motor_measure_t motor_chassis[7];
 
 /* USER CODE END 0 */
 
@@ -75,7 +76,6 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -104,32 +104,51 @@ int main(void)
   MX_UART7_Init();
   MX_UART8_Init();
   MX_USART3_UART_Init();
+  MX_TIM2_Init();
+  MX_TIM5_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 	//启动CAN通信
 	
 	//启动PWM 控制舵机
 	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1 | TIM_CHANNEL_2);
 	
+	HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_4);
+	
 	can_filter_init();
 	//初始化轮子
 	cheel_init();
 	//motor_speed_control(5000 ,10);
-		int p1 = 0;
-		int p2 = 0;
-			
+		int p1 = 0 ;
+		int p2 = 0 ;
+
+	
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
+  while ( 1 )
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+		HAL_TIM_Base_Start_IT(&htim6);
+		
+//		p1 = PID_calc(&motor[0].pid_inner,motor[0].speed_rpm,100); 
+//		CAN_cmd_chassis(p1,0,0,0);
+//		
+//		CAN_cmd_chassis(0,0,0,0);
+		for(int i = 0 ;i<100 ;i+=10 )
+		{
+			__HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_4,i);
+			HAL_Delay(100 );
+		}
+		//printf("%d",motor[0].circle);
+	//motor_position_control(190,1);//角度为减速机角度，变成输出角度要除以19
+	//motor_position_control(10,1);
 	//motor_position_control(5,1);
-
-		HAL_Delay(50);
+		
+		
   }
   /* USER CODE END 3 */
 }
@@ -180,6 +199,8 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+
 int fputc(int ch, FILE* f)
 {
     uint8_t temp[1] = {ch};
@@ -196,7 +217,9 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
+  
+	__disable_irq();
+	
   while (1)
   {
   }
