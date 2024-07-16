@@ -19,7 +19,7 @@
 
 #include "CAN_receive.h"
 #include "main.h"
-
+#include "centre.h"
 
 
 extern CAN_HandleTypeDef hcan1;
@@ -38,7 +38,7 @@ motor data,  0:chassis motor1 3508;1:chassis motor3 3508;2:chassis motor3 3508;3
 4:yaw gimbal motor 6020;5:pitch gimbal motor 6020;6:trigger motor 2006;
 电机数据, 0:底盘电机1 3508电机,  1:底盘电机2 3508电机,2:底盘电机3 3508电机,3:底盘电机4 3508电机;
 4:yaw云台电机 6020电机; 5:pitch云台电机 6020电机; 6:拨弹电机 2006电机*/
-static motor_measure_t motor_chassis[7];
+extern motor_measure_t motor_chassis[7];
 
 //static CAN_TxHeaderTypeDef  gimbal_tx_message;
 //static uint8_t              gimbal_can_send_data[8];
@@ -75,7 +75,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
             static uint8_t i = 0;
             //get motor id
             i = rx_header.StdId - CAN_3508_M1_ID;
-            get_motor_measure(&motor_chassis[i], rx_data);
+            get_motor_measure(&motor[i], rx_data);
             break;
         }
 

@@ -29,7 +29,8 @@
 #include "stdio.h"
 #include "CAN_receive.h"
 #include "bsp_can.h"
-#include "pid.h"
+#include "PID.h"
+#include "centre.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,6 +62,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+ MOTOR motor[3];
+motor_measure_t motor_chassis[7];
 
 /* USER CODE END 0 */
 
@@ -83,6 +86,8 @@ int main(void)
   /* USER CODE BEGIN Init */
 	
 	
+	
+	
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -103,9 +108,15 @@ int main(void)
 	//启动CAN通信
 	
 	//启动PWM 控制舵机
+	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1 | TIM_CHANNEL_2);
 	
 	can_filter_init();
-	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1 | TIM_CHANNEL_2);
+	//初始化轮子
+	cheel_init();
+	//motor_speed_control(5000 ,10);
+		int p1 = 0;
+			int p2 = 0;PID_calc(&motor[1].pid, motor[1].speed_rpm, 100);
+			
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -115,7 +126,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		CAN_cmd_chassis(1000,0,0,0);
+		//motor_speed_control(200,10);
+		
+		//CAN_cmd_chassis(p1, 1000, 0, 0);
+//		HAL_Delay(500);
+//		CAN_cmd_chassis(-1000, -1000, 0, 0);
+//		
+		p1 = PID_calc(&motor[0].pid, motor[0].speed_rpm, 200);
+		p2 = PID_calc(&motor[1].pid, motor[1].speed_rpm, 200);
+		CAN_cmd_chassis(p1, p2, 0, 0);
 		HAL_Delay(500);
   }
   /* USER CODE END 3 */
