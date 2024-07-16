@@ -22,15 +22,10 @@ void cheel_init(void)
 void motor_speed_control(int set, int time)
 {
 	time = clock() + time;
-	while(1){
-		if (clock() != time)
-		{
-			int p1 = PID_calc(&motor[0].pid, motor[0].speed_rpm, set);
-			int p2 = PID_calc(&motor[1].pid, motor[1].speed_rpm, set);
-			CAN_cmd_chassis(p1, p2, 0, 0);
-		}
-		else if (clock() >= time)
-			break;
+	while(clock() <= time){	
+		int p1 = PID_calc(&motor[0].pid, motor[0].speed_rpm, set);
+		int p2 = PID_calc(&motor[1].pid, motor[1].speed_rpm, set);
+		CAN_cmd_chassis(p1, p2, 0, 0);
 	}
 	CAN_cmd_chassis(0, 0, 0, 0);
 	for(int i = 0; i < 2; i ++){
