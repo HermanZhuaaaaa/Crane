@@ -31,8 +31,9 @@ extern CAN_HandleTypeDef hcan1;
         (ptr)->ecd = (uint16_t)((data)[0] << 8 | (data)[1]);            \
         (ptr)->speed_rpm = (uint16_t)((data)[2] << 8 | (data)[3]);      \
         (ptr)->given_current = (uint16_t)((data)[4] << 8 | (data)[5]);  \
-        (ptr)->temperate = (data)[6];                                   \
+        (ptr)->temperate = (data)[6]; 			\
     }
+		
 /*
 motor data,  0:chassis motor1 3508;1:chassis motor3 3508;2:chassis motor3 3508;3:chassis motor4 3508;
 4:yaw gimbal motor 6020;5:pitch gimbal motor 6020;6:trigger motor 2006;
@@ -73,9 +74,13 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         case CAN_TRIGGER_MOTOR_ID:
         {
             static uint8_t i = 0;
+						static uint16_t j = 0;
             //get motor id
             i = rx_header.StdId - CAN_3508_M1_ID;
             get_motor_measure(&motor[i], rx_data);
+						if((motor[i].ecd - motor[i].last_ecd > 1000) || (motor[i].ecd - motor[i].last_ecd < -1000))
+								j++;
+						motor[i].circle =j/19;
             break;
         }
 

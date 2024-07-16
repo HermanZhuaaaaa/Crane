@@ -9,44 +9,63 @@ extern MOTOR motor[3];
 //对轮子进行初始化
 void cheel_init(void)
 {
-	const float init_pid[3] = {1, 0.5, 0.1};//设定P、I、D三个参数
+	const float init_pid_inner[3] = {0.95, 0.2, 0.1};//设定P、I、D三个参数
+	const 	float init_pid_outer[3] = {1	,	0.2,0.1};
+
 	int now = 0;
-	int max_out = 2500, max_iout = 1250;
+	int max_out_inner = 2500, max_iout_inner = 1250;
+	int max_out_outer = 5000, max_iout_outer = 2500;	
 	for(int i = 0; i < 2; i ++){
 		//PID初始化函数
-		PID_init(&motor[i].pid, init_pid, max_out, max_iout);
+		PID_init(&motor[i].pid_inner, init_pid_inner, max_out_inner, max_iout_inner);
+		PID_init(&motor[i].pid_outer, init_pid_outer, max_out_outer, max_iout_outer);
+
 	}
 }
 
-//两轮子进行控制,其中set是预定的速度,time是前进时间
-void motor_speed_control(int set, int time)
+//uint16_t motor_angle_calc(uint8_t addr)
+//{
+//	if((motor[addr].ecd - motor[addr].last_ecd > 5000) || (motor[addr].ecd - motor[addr].last_ecd < -5000))
+//		circle +=1;
+//}
+
+void motor_position_control(float set_pos,uint8_t addr)
 {
-	time = clock() + time;
-	while(1){
-		if (clock() != time)
-		{
-			int p1 = PID_calc(&motor[0].pid, motor[0].speed_rpm, set);
-			int p2 = PID_calc(&motor[1].pid, motor[1].speed_rpm, set);
-			CAN_cmd_chassis(p1, p2, 0, 0);
-		}
-		else if (clock() >= time)
-			break;
-	}
-	CAN_cmd_chassis(0, 0, 0, 0);
-	for(int i = 0; i < 2; i ++){
-		PID_clear(&motor[i].pid);
-	}
+	Cascade_PID my_pid;
+	float p;
+	p = Cascade_PID_calc(&my_pid,set_pos,motor[addr].circle,motor[addr].speed_rpm);
+	if(addr == 1) CAN_cmd_chassis(p,0,0,0);
+	if(addr == 2) CAN_cmd_chassis(0,p,0,0);
+	if(addr == 3) CAN_cmd_chassis(0,0,p,0);
+	
 }
+//两轮子进行控制,其中set是预定的速度,time是前进时间
+
+//void motor_speed_control(int set, int time)
+//{
+//	time = clock() + time;
+//	while(clock() <= time){
+//			int p1 = PID_calc(&motor[0].pid, motor[0].speed_rpm, set);
+//			int p2 = PID_calc(&motor[1].pid, motor[1].speed_rpm, set);
+//			CAN_cmd_chassis(p1, p2, 0, 0);
+//		
+//	}
+//	CAN_cmd_chassis(0, 0, 0, 0);
+//	for(int i = 0; i < 2; i ++){
+//		PID_clear(&motor[i].pid);
+//	}
+//}
+
 
 //初始化云台
-void gimabal_init(void)
-{
-	const float init_pid[3] = {0, 0, 0};//设定P、I、D三个参数
-	int now = 0, setmax = 0;
-	int max_out = 0, max_iout = 0;
-	//PID初始化函数
-	PID_init(&motor[2].pid, init_pid, max_out, max_iout);
-}
+//void gimabal_init(void)
+//{
+//	const float init_pid[3] = {0, 0, 0};//设定P、I、D三个参数
+//	int now = 0, setmax = 0;
+//	int max_out = 0, max_iout = 0;
+//	//PID初始化函数
+//	PID_init(&motor[2]., init_pid, max_out, max_iout);
+//}
 
 //对云台进行角度控制
 void gimbal_angle_control(int angle)

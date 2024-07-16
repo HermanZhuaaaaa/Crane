@@ -115,7 +115,7 @@ int main(void)
 	cheel_init();
 	//motor_speed_control(5000 ,10);
 		int p1 = 0;
-			int p2 = 0;PID_calc(&motor[1].pid, motor[1].speed_rpm, 100);
+		int p2 = 0;
 			
   /* USER CODE END 2 */
 
@@ -126,16 +126,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		//motor_speed_control(200,10);
-		
-		//CAN_cmd_chassis(p1, 1000, 0, 0);
-//		HAL_Delay(500);
-//		CAN_cmd_chassis(-1000, -1000, 0, 0);
-//		
-		p1 = PID_calc(&motor[0].pid, motor[0].speed_rpm, 200);
-		p2 = PID_calc(&motor[1].pid, motor[1].speed_rpm, 200);
-		CAN_cmd_chassis(p1, p2, 0, 0);
-		HAL_Delay(500);
+
+	//motor_position_control(5,1);
+
+		HAL_Delay(50);
   }
   /* USER CODE END 3 */
 }
