@@ -8,26 +8,62 @@ extern MOTOR motor[3];
 extern Cascade_PID my_pid;
 float pos;
 
+
 //对轮子进行初始化
 void cheel_init(void)
 {
-	const 	float init_pid_inner[3] = {2, 0, 0};//设定P、I、D三个参数
-	const 	float init_pid_outer[3] = {3, 0, 0};
+	const 	float init_pid_inner[3] = {13, 0.5, 0.8};//设定P、I、D三个参数 2.5 0.09 0.005
+	
+	const float init_pid_cloud[3] = {40	,0.4,0}; //40 0.4 0 out:3k
+	const 	float init_pid_outer[3] = {50	, 0, 0.3}; // 50 0 0.3
 
-	int now = 0;
-	int max_out_inner = 1000, max_iout_inner = 700;
-	int max_out_outer = 200, max_iout_outer = 250;	
+	int now = 0, set = 0;
+	int max_out_inner = 2000, max_iout_inner = 1000;
+	int max_out_outer = 2000, max_iout_outer = 2500;	
+	int max_out_cloud = 4500, max_iout_cloud = 4500;	
+//	
 	PID_init(&my_pid.inner,init_pid_inner, max_out_inner, max_iout_inner);
 	PID_init(&my_pid.outer,init_pid_outer, max_out_outer, max_iout_outer);
-	for(int i = 0; i < 2; i ++){
+//	PID_init(&my_pid.cloud,init_pid_cloud, max_out_cloud, max_iout_cloud);
+
+	for(int i = 0; i <= 2; i ++){
 		//PID初始化函数
 		PID_init(&motor[i].pid_inner, init_pid_inner, max_out_inner, max_iout_inner);
 		PID_init(&motor[i].pid_outer, init_pid_outer, max_out_outer, max_iout_outer);
-		
+		PID_init(&motor[i].pid_cloud, init_pid_cloud, max_out_cloud, max_iout_cloud);
 	}
 	
 }
 
+/**
+  * @brief		计算电角度
+  * @param
+  * @retval
+  */
+/**
+  * @brief		??????
+  * @param
+  * @retval
+  */
+
+void Cale_angle_t(MOTOR *motor)
+{
+	if(motor->ecd-motor->last_ecd>4096) motor->circle--;
+	else if(motor->ecd-motor->last_ecd<-4096) motor->circle++;
+	motor->total_circle = motor->circle * 8192 + motor->ecd ; 
+	
+	if (motor->total_circle >= 155648)	motor->total_circle =motor->total_circle - 155648;
+	if (motor ->total_circle <0 ) motor->total_circle = motor->total_circle + 155648;
+	motor->angle = motor->total_circle/19.0f/8192*360;
+	//第一次跳变消除
+			static uint8_t sign_flag = 1;
+if(sign_flag)
+{
+	motor->circle = 0;
+	sign_flag = 0;
+}
+	
+}
 //uint16_t motor_angle_calc(uint8_t addr)
 //{
 //	if((motor[addr].ecd - motor[addr].last_ecd > 5000) || (motor[addr].ecd - motor[addr].last_ecd < -5000))

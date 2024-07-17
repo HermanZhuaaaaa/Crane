@@ -20,10 +20,18 @@
 #include "CAN_receive.h"
 #include "main.h"
 #include "centre.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 
 extern CAN_HandleTypeDef hcan1;
 //extern CAN_HandleTypeDef hcan2;
+#define ECD_MAX 8191
+
+// 声明全局变量
+//uint16_t last_ecd_1 = 0;
+bool first_call = true; // 标识是否为第一次调用中断函数
+
 //motor data read
 #define get_motor_measure(ptr, data)                                    \
     {                                                                   \
@@ -47,6 +55,37 @@ extern motor_measure_t motor_chassis[7];
 static CAN_TxHeaderTypeDef  chassis_tx_message;
 static uint8_t              chassis_can_send_data[8];
 
+		
+/**
+  * @brief		判断电机顺时针还是逆时针转动
+  * @param		输入ecd以及last_ecd
+  * @retval	返回顺时针还是逆时针
+  */
+		
+RotationDirection getRotationDirection(uint16_t ecd, uint16_t last_ecd) {
+    if (ecd > last_ecd) {
+        // 处理绕零情况
+        if (ecd - last_ecd > ECD_MAX / 2 ) 
+					{
+            return ROTATE_COUNTERCLOCKWISE;
+        } 
+				else {
+            return ROTATE_CLOCKWISE;
+        }
+    } 
+		else {
+        // 处理绕零情况
+        if (last_ecd - ecd > ECD_MAX / 2  ) 
+					{
+            return ROTATE_CLOCKWISE;
+        } 
+				else {
+            return ROTATE_COUNTERCLOCKWISE;
+        }
+    }
+}
+		
+		
 /**
   * @brief          hal CAN fifo call back, receive motor data
   * @param[in]      hcan, the point to CAN handle
@@ -61,7 +100,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
     CAN_RxHeaderTypeDef rx_header;
     uint8_t rx_data[8];
-
     HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data);
 
     switch (rx_header.StdId)
@@ -75,29 +113,28 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         case CAN_TRIGGER_MOTOR_ID:
         {
             static uint8_t i = 0 ;
-						static int16_t j = 0 ;
+					 static int16_t j = 0 ;
 						
             //get motor id
             i = rx_header.StdId - CAN_3508_M1_ID;
             get_motor_measure(&motor[i], rx_data);
+							Cale_angle_t(&motor[i]);
 					//判断顺时针或者逆时针
-						
-					if(motor[i].given_current<0)//顺时针
-					{
-						if(motor[i].last_ecd - motor[i].ecd > 1000)
-							{
-								j++;
-								
-							}	
-					}
-					
-					else if (motor[i].given_current >0)
-					{
-						if(motor[i].ecd - motor[i].last_ecd > 1000)
-							j--;
-					}//逆时针
 
-						motor[i].circle =j;
+//					RotationDirection direction = getRotationDirection(motor[i].ecd,motor[i].last_ecd);
+//					if (direction == ROTATE_CLOCKWISE) 
+//						{
+//									// 顺时针旋转的处理逻辑
+//							j--;
+//						} 
+					
+//					else if (direction == ROTATE_COUNTERCLOCKWISE) 
+//							{
+//									// 逆时针旋转的处理逻辑
+//								j++;
+//							}
+
+//						motor[i].circle =j;
             break;
         }
 

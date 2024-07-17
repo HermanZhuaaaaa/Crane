@@ -52,6 +52,9 @@
 
 /* USER CODE BEGIN PV */
 Cascade_PID my_pid;
+
+float M3508_speed_set ;
+float m3508_angle_set = 30; 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -65,7 +68,7 @@ void delay_ms(uint16_t cnt);
 
 	MOTOR motor[3];
 	motor_measure_t motor_chassis[7];
-
+	static unsigned long long sign = 0 ;
 /* USER CODE END 0 */
 
 /**
@@ -121,8 +124,47 @@ int main(void)
 	//motor_speed_control(5000 ,10);
 		int p1 = 0 ;
 		int p2 = 0 ;
+		int p3 = 0 ;
+			//__HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_4,120);		//前进方向舵机 占空比85是初始平放位置 120竖直位置
+			
+//					__HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_4,85);
+//		Emm_V5_Pos_Control(2,0,2500,125,8400,1,0); //8400高度足够 到达最大值 7400能够放置到高木上  4000足够放置到低木桩上
+//			HAL_Delay(1500);
+//Emm_V5_Pos_Control(1,0,2500,125,20000,1,0);
+//	HAL_Delay(1500);
+//Emm_V5_Pos_Control(2,0,1250,125,1000,1,0); //8400高度足够 到达最大值 7400能够放置到高木上  4000足够放置到低木桩上
+//	HAL_Delay(1750);
+//	__HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_4,120);
+//	Emm_V5_Pos_Control(2,0,1250,125,8400,1,0); //8400高度足够 到达最大值 7400能够放置到高木上  4000足够放置到低木桩上
 
-	
+			HAL_TIM_Base_Start_IT(&htim6);
+//		while(sign <=7000)
+//		{
+//			p1 = PID_calc(&motor[0].pid_inner,motor[0].speed_rpm,450); 
+//			p2 = PID_calc(&motor[1].pid_inner,motor[1].speed_rpm,450); 
+//			CAN_cmd_chassis(p1,-p2,0,0);
+//		}
+//		while(sign >7000 && sign<8000)
+//		{
+//			p1 = PID_calc(&motor[0].pid_inner,motor[0].speed_rpm,0); 
+//			p2 = PID_calc(&motor[1].pid_inner,motor[1].speed_rpm,0); 
+//			CAN_cmd_chassis(p1,-p2,0,0);
+//		}
+//		CAN_cmd_chassis(0,0,0,0);
+//		while(sign >0 && sign <7300)
+//		{
+//			p3 = PID_calc(&motor[2].pid_inner,motor[2].speed_rpm,8000); 
+//			CAN_cmd_chassis(0,0,p3,0);
+//					printf("%d \n",motor[2].speed_rpm );
+
+//		}
+//		while(sign >7300 && sign <10000)
+//		{
+
+//		}
+//		CAN_cmd_chassis(0,0,0,0);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -130,22 +172,31 @@ int main(void)
   while ( 1 )
   {
     /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-		HAL_TIM_Base_Start_IT(&htim6);
 		
-//		p1 = PID_calc(&motor[0].pid_inner,motor[0].speed_rpm,100); 
-//		CAN_cmd_chassis(p1,0,0,0);
-//		
+    /* USER CODE BEGIN 3 */
+		
+		HAL_Delay(1);
+		  M3508_speed_set = PID_calc(&motor[2].pid_outer,motor[2].angle,m3508_angle_set);
+			p3 = PID_calc(&motor[2].pid_cloud,motor[2].speed_rpm,M3508_speed_set); 
+			CAN_cmd_chassis(0,0,p3,0);
+				//	printf("%d \n",motor[2].speed_rpm );
+
+		
+			
+
+		
+		
+		
 //		CAN_cmd_chassis(0,0,0,0);
-		for(int i = 0 ;i<100 ;i+=10 )
-		{
-			__HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_4,i);
-			HAL_Delay(100 );
-		}
-		//printf("%d",motor[0].circle);
+//		for(int i = 0 ;i<100 ;i+=10 )
+//		{
+//			__HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_4,i);
+//			HAL_Delay(100 );
+//		}
+	
 	//motor_position_control(190,1);//角度为减速机角度，变成输出角度要除以19
-	//motor_position_control(10,1);
+		printf("%d \n",motor[2].speed_rpm );
+		//motor_position_control(10,1);
 	//motor_position_control(5,1);
 		
 		
@@ -199,7 +250,14 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	//一毫秒进入一次中断函数
+	if(htim->Instance == TIM6)
+	{
+		sign++;
+	}
+}
 
 int fputc(int ch, FILE* f)
 {

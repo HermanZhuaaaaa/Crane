@@ -12,10 +12,13 @@ typedef struct{
   int16_t given_current;//电流
   uint8_t temperate;//温度
   int16_t last_ecd;//原角度
+	int32_t total_circle; //全部的
 	int16_t circle;	//圈数
+	float angle;
 	
 	pid_type_def pid_inner;//该电机的PID结构体
 	pid_type_def pid_outer;
+	pid_type_def pid_cloud;
 }MOTOR;
 
 extern MOTOR motor[3];
@@ -29,5 +32,5 @@ extern void cheel_init(void);
 extern void motor_position_control(float set_pos,uint8_t addr);
 //对云台进行角度控制
 extern void gimbal_angle_control(int angle);
-
+void Cale_angle_t(MOTOR *motor);
 #endif

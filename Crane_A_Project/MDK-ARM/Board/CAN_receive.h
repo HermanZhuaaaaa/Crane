@@ -41,6 +41,11 @@ typedef enum
 
 } can_msg_id_e;
 
+typedef enum {
+    ROTATE_CLOCKWISE = 0 ,     // 顺时针
+    ROTATE_COUNTERCLOCKWISE // 逆时针
+} RotationDirection;
+
 //rm motor data
 typedef struct
 {
@@ -50,6 +55,17 @@ typedef struct
     uint8_t temperate;
     int16_t last_ecd;
 } motor_measure_t;
+
+
+
+
+/**
+  * @brief		判断电机顺时针还是逆时针转动
+  * @param		输入ecd以及last_ecd
+  * @retval	返回顺时针还是逆时针
+  */
+RotationDirection getRotationDirection(uint16_t ecd, uint16_t last_ecd);
+
 
 
 /**
