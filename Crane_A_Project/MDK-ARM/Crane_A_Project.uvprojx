@@ -609,6 +609,16 @@
               <FileType>5</FileType>
               <FilePath>.\tasks\centre.h</FilePath>
             </File>
+            <File>
+              <FileName>work.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\tasks\work.c</FilePath>
+            </File>
+            <File>
+              <FileName>work.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\tasks\work.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

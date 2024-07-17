@@ -31,6 +31,7 @@
 "crane_a_project\fifo.o"
 "crane_a_project\pid.o"
 "crane_a_project\centre.o"
+"crane_a_project\work.o"
 --library_type=microlib --strict --scatter "Crane_A_Project\Crane_A_Project.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

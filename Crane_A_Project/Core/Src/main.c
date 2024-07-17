@@ -31,6 +31,7 @@
 #include "bsp_can.h"
 #include "PID.h"
 #include "centre.h"
+#include "work.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,6 +56,13 @@ Cascade_PID my_pid;
 
 float M3508_speed_set ;
 float m3508_angle_set = 30; 
+
+int p1 = 0 ;
+int p2 = 0 ;
+int p3 = 0 ;
+
+MOTOR motor[3];
+static unsigned long long sign = 0 ;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -66,9 +74,7 @@ void delay_ms(uint16_t cnt);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-	MOTOR motor[3];
-	motor_measure_t motor_chassis[7];
-	static unsigned long long sign = 0 ;
+
 /* USER CODE END 0 */
 
 /**
@@ -111,33 +117,25 @@ int main(void)
   MX_TIM5_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-	//启动CAN通信
+
 	
 	//启动PWM 控制舵机
+	//
 	HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1 | TIM_CHANNEL_2);
 	
+	//A处舵机
 	HAL_TIM_PWM_Start(&htim5,TIM_CHANNEL_4);
 	
+	//启动CAN通信	
 	can_filter_init();
+	
 	//初始化轮子
 	cheel_init();
-	//motor_speed_control(5000 ,10);
-		int p1 = 0 ;
-		int p2 = 0 ;
-		int p3 = 0 ;
-			//__HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_4,120);		//前进方向舵机 占空比85是初始平放位置 120竖直位置
-			
-//					__HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_4,85);
-//		Emm_V5_Pos_Control(2,0,2500,125,8400,1,0); //8400高度足够 到达最大值 7400能够放置到高木上  4000足够放置到低木桩上
-//			HAL_Delay(1500);
-//Emm_V5_Pos_Control(1,0,2500,125,20000,1,0);
-//	HAL_Delay(1500);
-//Emm_V5_Pos_Control(2,0,1250,125,1000,1,0); //8400高度足够 到达最大值 7400能够放置到高木上  4000足够放置到低木桩上
-//	HAL_Delay(1750);
-//	__HAL_TIM_SET_COMPARE(&htim5,TIM_CHANNEL_4,120);
-//	Emm_V5_Pos_Control(2,0,1250,125,8400,1,0); //8400高度足够 到达最大值 7400能够放置到高木上  4000足够放置到低木桩上
+	
+	//开启TIM6定时器，每隔1ms进入一次中断
+	//HAL_TIM_Base_Start_IT(&htim6);
 
-			HAL_TIM_Base_Start_IT(&htim6);
+
 //		while(sign <=7000)
 //		{
 //			p1 = PID_calc(&motor[0].pid_inner,motor[0].speed_rpm,450); 
@@ -164,7 +162,7 @@ int main(void)
 //		}
 //		CAN_cmd_chassis(0,0,0,0);
 
-
+Work_FromInnerToOuter();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -175,10 +173,10 @@ int main(void)
 		
     /* USER CODE BEGIN 3 */
 		
-		HAL_Delay(1);
-		  M3508_speed_set = PID_calc(&motor[2].pid_outer,motor[2].angle,m3508_angle_set);
-			p3 = PID_calc(&motor[2].pid_cloud,motor[2].speed_rpm,M3508_speed_set); 
-			CAN_cmd_chassis(0,0,p3,0);
+//		HAL_Delay(1);
+//		  M3508_speed_set = PID_calc(&motor[2].pid_outer,motor[2].angle,m3508_angle_set);
+//			p3 = PID_calc(&motor[2].pid_cloud,motor[2].speed_rpm,M3508_speed_set); 
+//			CAN_cmd_chassis(0,0,p3,0);
 				//	printf("%d \n",motor[2].speed_rpm );
 
 		

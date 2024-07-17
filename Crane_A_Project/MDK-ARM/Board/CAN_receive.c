@@ -25,12 +25,6 @@
 
 
 extern CAN_HandleTypeDef hcan1;
-//extern CAN_HandleTypeDef hcan2;
-#define ECD_MAX 8191
-
-// 声明全局变量
-//uint16_t last_ecd_1 = 0;
-bool first_call = true; // 标识是否为第一次调用中断函数
 
 //motor data read
 #define get_motor_measure(ptr, data)                                    \
@@ -48,44 +42,10 @@ motor data,  0:chassis motor1 3508;1:chassis motor3 3508;2:chassis motor3 3508;3
 电机数据, 0:底盘电机1 3508电机,  1:底盘电机2 3508电机,2:底盘电机3 3508电机,3:底盘电机4 3508电机;
 4:yaw云台电机 6020电机; 5:pitch云台电机 6020电机; 6:拨弹电机 2006电机
 		*/
-extern motor_measure_t motor_chassis[7];
-
-//static CAN_TxHeaderTypeDef  gimbal_tx_message;
-//static uint8_t              gimbal_can_send_data[8];
+motor_measure_t motor_chassis[7];
 static CAN_TxHeaderTypeDef  chassis_tx_message;
 static uint8_t              chassis_can_send_data[8];
 
-		
-/**
-  * @brief		判断电机顺时针还是逆时针转动
-  * @param		输入ecd以及last_ecd
-  * @retval	返回顺时针还是逆时针
-  */
-		
-RotationDirection getRotationDirection(uint16_t ecd, uint16_t last_ecd) {
-    if (ecd > last_ecd) {
-        // 处理绕零情况
-        if (ecd - last_ecd > ECD_MAX / 2 ) 
-					{
-            return ROTATE_COUNTERCLOCKWISE;
-        } 
-				else {
-            return ROTATE_CLOCKWISE;
-        }
-    } 
-		else {
-        // 处理绕零情况
-        if (last_ecd - ecd > ECD_MAX / 2  ) 
-					{
-            return ROTATE_CLOCKWISE;
-        } 
-				else {
-            return ROTATE_COUNTERCLOCKWISE;
-        }
-    }
-}
-		
-		
 /**
   * @brief          hal CAN fifo call back, receive motor data
   * @param[in]      hcan, the point to CAN handle
@@ -118,23 +78,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
             //get motor id
             i = rx_header.StdId - CAN_3508_M1_ID;
             get_motor_measure(&motor[i], rx_data);
-							Cale_angle_t(&motor[i]);
-					//判断顺时针或者逆时针
-
-//					RotationDirection direction = getRotationDirection(motor[i].ecd,motor[i].last_ecd);
-//					if (direction == ROTATE_CLOCKWISE) 
-//						{
-//									// 顺时针旋转的处理逻辑
-//							j--;
-//						} 
 					
-//					else if (direction == ROTATE_COUNTERCLOCKWISE) 
-//							{
-//									// 逆时针旋转的处理逻辑
-//								j++;
-//							}
-
-//						motor[i].circle =j;
+					 //计算角度
+					 Cale_angle_t(&motor[i]);
             break;
         }
 
@@ -144,42 +90,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         }
     }
 }
-
-
-
-/**
-  * @brief          send control current of motor (0x205, 0x206, 0x207, 0x208)
-  * @param[in]      yaw: (0x205) 6020 motor control current, range [-30000,30000] 
-  * @param[in]      pitch: (0x206) 6020 motor control current, range [-30000,30000]
-  * @param[in]      shoot: (0x207) 2006 motor control current, range [-10000,10000]
-  * @param[in]      rev: (0x208) reserve motor control current
-  * @retval         none
-  */
-/**
-  * @brief          发送电机控制电流(0x205,0x206,0x207,0x208)
-  * @param[in]      yaw: (0x205) 6020电机控制电流, 范围 [-30000,30000]
-  * @param[in]      pitch: (0x206) 6020电机控制电流, 范围 [-30000,30000]
-  * @param[in]      shoot: (0x207) 2006电机控制电流, 范围 [-10000,10000]
-  * @param[in]      rev: (0x208) 保留，电机控制电流
-  * @retval         none
-  */
-//void CAN_cmd_gimbal(int16_t yaw, int16_t pitch, int16_t shoot, int16_t rev)
-//{
-//    uint32_t send_mail_box;
-//    gimbal_tx_message.StdId = CAN_GIMBAL_ALL_ID;
-//    gimbal_tx_message.IDE = CAN_ID_STD;
-//    gimbal_tx_message.RTR = CAN_RTR_DATA;
-//    gimbal_tx_message.DLC = 0x08;
-//    gimbal_can_send_data[0] = (yaw >> 8);
-//    gimbal_can_send_data[1] = yaw;
-//    gimbal_can_send_data[2] = (pitch >> 8);
-//    gimbal_can_send_data[3] = pitch;
-//    gimbal_can_send_data[4] = (shoot >> 8);
-//    gimbal_can_send_data[5] = shoot;
-//    gimbal_can_send_data[6] = (rev >> 8);
-//    gimbal_can_send_data[7] = rev;
-//    HAL_CAN_AddTxMessage(&GIMBAL_CAN, &gimbal_tx_message, gimbal_can_send_data, &send_mail_box);
-//}
 
 /**
   * @brief          send CAN packet of ID 0x700, it will set chassis motor 3508 to quick ID setting
@@ -244,36 +154,6 @@ void CAN_cmd_chassis(int16_t motor1, int16_t motor2, int16_t motor3, int16_t mot
     chassis_can_send_data[7] = motor4;
 
     HAL_CAN_AddTxMessage(&CHASSIS_CAN, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
-}
-
-/**
-  * @brief          return the yaw 6020 motor data point
-  * @param[in]      none
-  * @retval         motor data point
-  */
-/**
-  * @brief          返回yaw 6020电机数据指针
-  * @param[in]      none
-  * @retval         电机数据指针
-  */
-const motor_measure_t *get_yaw_gimbal_motor_measure_point(void)
-{
-    return &motor_chassis[4];
-}
-
-/**
-  * @brief          return the pitch 6020 motor data point
-  * @param[in]      none
-  * @retval         motor data point
-  */
-/**
-  * @brief          返回pitch 6020电机数据指针
-  * @param[in]      none
-  * @retval         电机数据指针
-  */
-const motor_measure_t *get_pitch_gimbal_motor_measure_point(void)
-{
-    return &motor_chassis[5];
 }
 
 
