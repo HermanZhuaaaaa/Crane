@@ -1,5 +1,6 @@
 --cpu=Cortex-M4.fp.sp
 "crane_a_project\startup_stm32f427xx.o"
+"crane_a_project\can_receive.o"
 "crane_a_project\main.o"
 "crane_a_project\gpio.o"
 "crane_a_project\can.o"
@@ -7,6 +8,7 @@
 "crane_a_project\usart.o"
 "crane_a_project\stm32f4xx_it.o"
 "crane_a_project\stm32f4xx_hal_msp.o"
+"crane_a_project\bsp_can.o"
 "crane_a_project\stm32f4xx_hal_can.o"
 "crane_a_project\stm32f4xx_hal_rcc.o"
 "crane_a_project\stm32f4xx_hal_rcc_ex.o"
@@ -25,8 +27,6 @@
 "crane_a_project\stm32f4xx_hal_tim_ex.o"
 "crane_a_project\stm32f4xx_hal_uart.o"
 "crane_a_project\system_stm32f4xx.o"
-"crane_a_project\bsp_can.o"
-"crane_a_project\can_receive.o"
 "crane_a_project\emm_v5.o"
 "crane_a_project\fifo.o"
 "crane_a_project\pid.o"

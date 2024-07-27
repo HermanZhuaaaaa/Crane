@@ -23,8 +23,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-
+extern uint8_t first_flag;
 extern CAN_HandleTypeDef hcan1;
+
 
 //motor data read
 #define get_motor_measure(ptr, data)                                    \
@@ -73,15 +74,30 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         case CAN_TRIGGER_MOTOR_ID:
         {
             static uint8_t i = 0 ;
-					 static int16_t j = 0 ;
+				
 						
             //get motor id
             i = rx_header.StdId - CAN_3508_M1_ID;
             get_motor_measure(&motor[i], rx_data);
 					
+						//计算平均转速
+					Cale_speed_average(&motor[i]);	
+		
+					
+					
 					 //计算角度
 					 Cale_angle_t(&motor[i]);
-            break;
+					//忽略第一次角度	
+					if(first_flag == 0)
+					{
+					 motor[i].m3508_angle_zero = motor[i].angle;
+					 motor[i].m3508_circle_zero = motor[i].circle;
+					 motor[i].m3508_total_circle_zero = motor[i].total_circle;
+						first_flag = 1;
+					}
+
+
+			            break;
         }
 
         default:

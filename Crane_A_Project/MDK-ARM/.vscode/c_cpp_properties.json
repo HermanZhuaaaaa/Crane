@@ -3,19 +3,19 @@
         {
             "name": "Crane_A_Project",
             "includePath": [
-                "e:\\Documents\\Crane_A_Project\\Core\\Inc",
-                "e:\\Documents\\Crane_A_Project\\Drivers\\STM32F4xx_HAL_Driver\\Inc",
-                "e:\\Documents\\Crane_A_Project\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\Legacy",
-                "e:\\Documents\\Crane_A_Project\\Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Include",
-                "e:\\Documents\\Crane_A_Project\\Drivers\\CMSIS\\Include",
-                "e:\\Documents\\Crane_A_Project\\MDK-ARM\\Board",
-                "e:\\Documents\\Crane_A_Project\\MDK-ARM\\algorithm",
-                "e:\\Documents\\Crane_A_Project\\MDK-ARM\\tasks",
+                "e:\\Documents\\Crane_A_Project_Example - 副本 - VSCODE\\Core\\Inc",
+                "e:\\Documents\\Crane_A_Project_Example - 副本 - VSCODE\\Drivers\\STM32F4xx_HAL_Driver\\Inc",
+                "e:\\Documents\\Crane_A_Project_Example - 副本 - VSCODE\\Drivers\\STM32F4xx_HAL_Driver\\Inc\\Legacy",
+                "e:\\Documents\\Crane_A_Project_Example - 副本 - VSCODE\\Drivers\\CMSIS\\Device\\ST\\STM32F4xx\\Include",
+                "e:\\Documents\\Crane_A_Project_Example - 副本 - VSCODE\\Drivers\\CMSIS\\Include",
+                "e:\\Documents\\Crane_A_Project_Example - 副本 - VSCODE\\MDK-ARM\\Board",
+                "e:\\Documents\\Crane_A_Project_Example - 副本 - VSCODE\\MDK-ARM\\algorithm",
+                "e:\\Documents\\Crane_A_Project_Example - 副本 - VSCODE\\MDK-ARM\\tasks",
                 "D:\\ProgramFiles\\Keil_v5\\ARM\\ARMCC\\include",
                 "D:\\ProgramFiles\\Keil_v5\\ARM\\ARMCC\\include\\rw",
-                "e:\\Documents\\Crane_A_Project\\MDK-ARM",
-                "e:\\Documents\\Crane_A_Project\\Core\\Src",
-                "e:\\Documents\\Crane_A_Project\\Drivers\\STM32F4xx_HAL_Driver\\Src"
+                "e:\\Documents\\Crane_A_Project_Example - 副本 - VSCODE\\MDK-ARM",
+                "e:\\Documents\\Crane_A_Project_Example - 副本 - VSCODE\\Core\\Src",
+                "e:\\Documents\\Crane_A_Project_Example - 副本 - VSCODE\\Drivers\\STM32F4xx_HAL_Driver\\Src"
             ],
             "defines": [
                 "USE_HAL_DRIVER",

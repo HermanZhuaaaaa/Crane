@@ -39,6 +39,8 @@ extern UART_HandleTypeDef huart8;
 
 extern UART_HandleTypeDef huart3;
 
+extern UART_HandleTypeDef huart6;
+
 /* USER CODE BEGIN Private defines */
 	extern __IO bool rxFrameFlag;
   extern __IO uint8_t rxCmd[FIFO_SIZE];
@@ -49,6 +51,7 @@ extern UART_HandleTypeDef huart3;
 void MX_UART7_Init(void);
 void MX_UART8_Init(void);
 void MX_USART3_UART_Init(void);
+void MX_USART6_UART_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 void usart_SendCmd(__IO uint8_t *cmd, uint8_t len);

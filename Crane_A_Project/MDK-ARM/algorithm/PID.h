@@ -16,6 +16,9 @@ typedef struct{
 	float set;
 	float now;
 	
+	float DeadZone;
+	float lastout;
+	
 	//输出值
 	float out;		//三项总输出
   float pout;	//比例项输出
@@ -40,7 +43,7 @@ typedef struct
 extern float limit(int now, int setmax);
 
 //PID初始化函数
-extern void PID_init(pid_type_def *pid, const float PID[3], float max_out, float max_iout);
+extern void PID_init(pid_type_def *pid, const float PID[3],float deadzone, float max_out, float max_iout);
 
 //PID运算函数(位置)
 extern float PID_calc(pid_type_def *pid, float now, float set);

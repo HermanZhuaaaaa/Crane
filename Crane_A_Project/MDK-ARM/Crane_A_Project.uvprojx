@@ -395,6 +395,11 @@
           <GroupName>Application/User/Core</GroupName>
           <Files>
             <File>
+              <FileName>CAN_receive.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Board\CAN_receive.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/main.c</FilePath>
@@ -434,6 +439,11 @@
         <Group>
           <GroupName>Drivers/STM32F4xx_HAL_Driver</GroupName>
           <Files>
+            <File>
+              <FileName>bsp_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Board\bsp_can.c</FilePath>
+            </File>
             <File>
               <FileName>stm32f4xx_hal_can.c</FileName>
               <FileType>1</FileType>
@@ -535,19 +545,9 @@
           <GroupName>Board</GroupName>
           <Files>
             <File>
-              <FileName>bsp_can.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Board\bsp_can.c</FilePath>
-            </File>
-            <File>
               <FileName>bsp_can.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Board\bsp_can.h</FilePath>
-            </File>
-            <File>
-              <FileName>CAN_receive.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Board\CAN_receive.c</FilePath>
             </File>
             <File>
               <FileName>CAN_receive.h</FileName>

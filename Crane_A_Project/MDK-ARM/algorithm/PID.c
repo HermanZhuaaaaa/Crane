@@ -11,7 +11,7 @@ float limit(int now, int setmax)
 }
 
 //PID初始化函数
-void PID_init(pid_type_def *pid, const float PID[3], float max_out, float max_iout)
+void PID_init(pid_type_def *pid, const float PID[3],float deadzone, float max_out, float max_iout)
 {
 		//判断是否有PID控制电机需要初始化
     if (pid == NULL || PID == NULL)
@@ -25,6 +25,9 @@ void PID_init(pid_type_def *pid, const float PID[3], float max_out, float max_io
 		//初始化最大值
     pid->max_out = max_out;
     pid->max_iout = max_iout;
+		
+		pid->DeadZone = deadzone;
+		
 		//初始化现值与误差值
     pid->dcur[0] = pid->dcur[1] = pid->dcur[2] = 0.0f;
     pid->error[0] = pid->error[1] = pid->error[2] = pid->pout = pid->iout = pid->dout = pid->out = 0.0f;
@@ -47,6 +50,15 @@ float PID_calc(pid_type_def *pid, float now, float set)
     pid->now = now;
 		//计算最新的误差值
     pid->error[0] = set - now;
+		
+				
+		//设置死区
+		if( (pid->error[0] < pid->DeadZone)&&(pid->error[0]> -pid->DeadZone))
+		{
+			pid->error[0] = 0;
+		}
+		
+		
 		//保持电机恒定速度转动，这里采用位置式PID
 		//比例项计算输出
 		pid->pout = pid->Kp * pid->error[0];
@@ -94,6 +106,7 @@ float Cascade_PID_calc(Cascade_PID *pid,float outer_set,float outer_now,float in
   PID_calc(&pid->outer,outer_now,outer_set);
   PID_calc(&pid->inner,inner_now,pid->outer.out);
   pid->out = pid->inner.out;
+	return pid->out;
 }
 
 
